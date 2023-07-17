@@ -28,7 +28,7 @@ class Game
     
     def filterWords
         words = []
-        File.open("words.txt", "r").each_line do |line|
+        File.open("./words.txt", "r").each_line do |line|
           if line.length >= 5 && line.length <= 12
             words.push(line)
           end
