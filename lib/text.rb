@@ -1,10 +1,5 @@
 class Text
-    def initialize
-        @intro = intro
-        @startMenu = startMenu
-    end
-    attr_accessor :intro, :startMenu
-
+    
     def intro
         puts "Welcome to Hangman!"
         puts "You have 10 guesses to guess the word."
@@ -18,5 +13,10 @@ class Text
         puts "2. Load Game"
         puts "3. Exit"
         print "Please select an option: "
+    end
+    def game(guesses, display)
+        puts "Letters guessed: "
+        puts "Incorrect guesses remaining: #{guesses}"
+        puts display.join("")
     end
 end
