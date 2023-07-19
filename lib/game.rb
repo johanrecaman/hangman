@@ -1,3 +1,4 @@
+require 'io/console'
 require_relative 'text.rb'
 
 class Game
@@ -6,15 +7,17 @@ class Game
     end
 
     def start
-        @text.intro
         @text.startMenu
         while true
             option = gets.chomp
             if option == "1"
+                @text.clear
                 newGame
             elsif option == "2"
+                @text.clear
                 loadGame
             elsif option == "3"
+                @text.clear
                 exit
             else
                 puts "Invalid option. Please try again."
@@ -22,16 +25,20 @@ class Game
         end
     end
     def newGame
-        guesses = 10
         words = filterWords
         word = randomWord(words)
-        display = ["_"] * (word.length - 1)
-        counter = 0
-        while guesses > 0 and counter != (word.length - 1)
 
-            @text.game(guesses, display)
+        rightGuesses = []
+        guesses = 10
+        rightGuessesCounter = 0
+        
+        display = ["_"] * (word.length - 1)
+        while guesses > 0 and rightGuessesCounter != (word.length - 1)
+
+            @text.game(guesses, display, rightGuesses)
 
             guess = gets.chomp.downcase
+            rightGuesses.push(guess)
             positions = []
 
             word.chars.each_with_index do |char, index|
@@ -43,11 +50,11 @@ class Game
                 guesses -= 1
                 puts "No Luck!"
             else
-                puts "Good guess!"
                 for index in positions do
                     display[index] = guess
-                    counter += 1
                 end
+                rightGuessesCounter += 1
+                puts "Good guess!"
             end
         end
         if guesses == 0
@@ -61,7 +68,7 @@ class Game
     def filterWords
         words = []
         File.open("./words.txt", "r").each_line do |line|
-          if line.length >= 5 && line.length <= 12
+          if line.length >= 7 && line.length <= 12
             words.push(line)
           end
         end
@@ -69,7 +76,7 @@ class Game
       end
       
       def randomWord(words)
-          selected_word = words[rand(words.length)]
+          selected_word = words[rand(words.length - 1)]
           selected_word
       end
 end
