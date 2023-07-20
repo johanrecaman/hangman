@@ -1,0 +1,18 @@
+---
+word: 'guided
+
+  '
+guesseNumber: 8
+rightGuessesCounter: 2
+display:
+- _
+- _
+- i
+- _
+- e
+- _
+guesses:
+- "\e[94m a\e[0m"
+- "\e[32m e\e[0m"
+- "\e[32m i\e[0m"
+- "\e[94m o\e[0m"

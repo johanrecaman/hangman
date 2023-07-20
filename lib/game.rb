@@ -6,6 +6,7 @@ class Game
         @text = Text.new
     end
 
+    # This method is the option menu of the game
     def start
         @text.startMenu
         while true
@@ -24,6 +25,7 @@ class Game
             end
         end
     end
+
     def newGame
         words = filterWords
         word = randomWord(words)
@@ -31,17 +33,25 @@ class Game
         guesses = []
         guessesNumber = 10
         rightGuessesCounter = 0
-        
-        display = ["_"] * (word.length - 1)
-        while guessesNumber > 0 and rightGuessesCounter != (word.length - 1)
 
+        display = ["_"] * (word.length - 1)
+        gameLoop(word, guessesNumber, rightGuessesCounter, display, guesses)
+    end
+
+    # This method is the main game loop
+    def gameLoop(word, guessesNumber, rightGuessesCounter, display, guesses)
+        @text.clear
+        while guessesNumber > 0 and rightGuessesCounter != (word.length - 1)
             @text.game(guessesNumber, display, guesses)
 
+            # This is the input of the user
             guess = gets.chomp.downcase
             if guess.length != 1
                 if guess == "save"
+                    @text.clear
                     puts @text.colorize("Enter the name of the file: ", 35)
                     filePath = gets.chomp
+                    @text.clear
                     saveGame(word, guessesNumber, rightGuessesCounter, display, guesses, filePath)
                     exit
                 else
@@ -52,6 +62,7 @@ class Game
                 end
             end
 
+            # This is the logic of the game
             if word.chars.any? { |char| char == guess }
                 guesses.push("\e[32m #{guess}\e[0m")
             else
@@ -70,8 +81,9 @@ class Game
             else
                 for index in positions do
                     display[index] = guess
+                    rightGuessesCounter += 1
                 end
-                rightGuessesCounter += 1
+                puts rightGuessesCounter
                 puts @text.colorize("Correct guess!", 32)
             end
             sleep(1)
@@ -80,11 +92,37 @@ class Game
         if guessesNumber == 0
             puts @text.colorize("You lost! The word was #{word}", 94)
         else
-            puts @text.colorize("You won!", 32)
+            puts @text.colorize("You won! The word was #{word}", 32)
         end
     end
-    
+
+    def loadGame
+        # This is the list of saved games
+        savedGame = Dir.glob(File.join("./saved", '*.yaml')).map { |file| File.basename(file, '.yaml') }
+        puts @text.colorize("Choose your save:", 35)
+        savedGame.each_with_index do |file, index|
+            puts "#{index + 1}. #{file}"
+        end
+        while true
+            option = gets.chomp
+            if option.to_i <= savedGame.length
+                break
+            else
+                puts @text.colorize("Invalid option. Please try again.", 31)
+            end
+        end
+        # This loads the saved game
+        data = YAML.load(File.read("./saved/#{savedGame[option.to_i - 1]}.yaml"))
+        word = data["word"]
+        guessesNumber = data["guesseNumber"]
+        rightGuessesCounter = data["rightGuessesCounter"]
+        display = data["display"]
+        guesses = data["guesses"]
+        gameLoop(word, guessesNumber, rightGuessesCounter, display, guesses)
+    end
+
     def saveGame(word, guessesNumber, rightGuessesCounter, display, guesses, filePath)
+        # This is the data that will be saved
         data = {
             "word" => word,
             "guesseNumber" => guessesNumber,
@@ -97,7 +135,6 @@ class Game
         end
         puts @text.colorize("Game saved!", 35)
     end
-
 
     def filterWords
         words = []
