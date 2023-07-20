@@ -99,7 +99,7 @@ class Game
     def loadGame
         # This is the list of saved games
         savedGame = Dir.glob(File.join("./saved", '*.yaml')).map { |file| File.basename(file, '.yaml') }
-        puts @text.colorize("Choose your save:", 35)
+        puts @text.colorize("Choose your save [1 - #{savedGame.length}]:", 35)
         savedGame.each_with_index do |file, index|
             puts "#{index + 1}. #{file}"
         end
