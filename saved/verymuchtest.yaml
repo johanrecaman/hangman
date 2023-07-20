@@ -1,0 +1,21 @@
+---
+word: 'remind
+
+  '
+guesseNumber: 6
+rightGuessesCounter: 3
+display:
+- r
+- e
+- _
+- i
+- _
+- _
+guesses:
+- "\e[94m a\e[0m"
+- "\e[32m e\e[0m"
+- "\e[32m i\e[0m"
+- "\e[94m s\e[0m"
+- "\e[94m o\e[0m"
+- "\e[94m u\e[0m"
+- "\e[32m r\e[0m"
