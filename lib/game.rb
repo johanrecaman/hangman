@@ -1,5 +1,5 @@
-require 'io/console'
 require_relative 'text.rb'
+require 'yaml'	
 
 class Game
     def initialize
@@ -28,17 +28,35 @@ class Game
         words = filterWords
         word = randomWord(words)
 
-        rightGuesses = []
-        guesses = 10
+        guesses = []
+        guessesNumber = 10
         rightGuessesCounter = 0
         
         display = ["_"] * (word.length - 1)
-        while guesses > 0 and rightGuessesCounter != (word.length - 1)
+        while guessesNumber > 0 and rightGuessesCounter != (word.length - 1)
 
-            @text.game(guesses, display, rightGuesses)
+            @text.game(guessesNumber, display, guesses)
 
             guess = gets.chomp.downcase
-            rightGuesses.push(guess)
+            if guess.length != 1
+                if guess == "save"
+                    puts @text.colorize("Enter the name of the file: ", 35)
+                    filePath = gets.chomp
+                    saveGame(word, guessesNumber, rightGuessesCounter, display, guesses, filePath)
+                    exit
+                else
+                    puts @text.colorize("Invalid input. Please try again.", 31)
+                    sleep(1)
+                    @text.clear
+                    next
+                end
+            end
+
+            if word.chars.any? { |char| char == guess }
+                guesses.push("\e[32m #{guess}\e[0m")
+            else
+                guesses.push("\e[94m #{guess}\e[0m")
+            end
             positions = []
 
             word.chars.each_with_index do |char, index|
@@ -47,23 +65,39 @@ class Game
                 end
             end
             if positions.empty?
-                guesses -= 1
-                puts "No Luck!"
+                guessesNumber -= 1
+                puts @text.colorize("Incorrect guess!", 94)
             else
                 for index in positions do
                     display[index] = guess
                 end
                 rightGuessesCounter += 1
-                puts "Good guess!"
+                puts @text.colorize("Correct guess!", 32)
             end
+            sleep(1)
+            @text.clear
         end
-        if guesses == 0
-            puts "vc perdeu"
+        if guessesNumber == 0
+            puts @text.colorize("You lost! The word was #{word}", 94)
         else
-            puts "vc ganhou"
+            puts @text.colorize("You won!", 32)
         end
     end
     
+    def saveGame(word, guessesNumber, rightGuessesCounter, display, guesses, filePath)
+        data = {
+            "word" => word,
+            "guesseNumber" => guessesNumber,
+            "rightGuessesCounter" => rightGuessesCounter,
+            "display" => display,
+            "guesses" => guesses
+        }
+        File.open("./saved/#{filePath}.yaml", "w") do |file|
+            file.write(YAML.dump(data))
+        end
+        puts @text.colorize("Game saved!", 35)
+    end
+
 
     def filterWords
         words = []
